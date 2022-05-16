@@ -66,6 +66,93 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         address to,
         uint256 tokenId
     ) internal override(ERC721, ERC721Enumerable) {
+    function checkUpkeep(bytes calldata /* checkData */) external view override returns (bool upkeepNeeded, bytes memory /*performData */) {
+         upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
+    }
+
+    function performUpkeep(bytes calldata /* performData */ ) external override {
+        //We highly recommend revalidating the upkeep in the performUpkeep function
+        if ((block.timestamp - lastTimeStamp) > interval ) {
+            lastTimeStamp = block.timestamp;         
+            int latestPrice =  getLatestPrice(); 
+        
+            if (latestPrice == currentPrice) {
+                console.log("NO CHANGE -> returning!");
+                return;
+            }
+
+            if (latestPrice < currentPrice) {
+                // bear
+                console.log("ITS BEAR TIME");
+                updateAllTokenUris("bear");
+
+            } else {
+                // bull
+                console.log("ITS BULL TIME");
+                updateAllTokenUris("bull");
+            }
+
+            // update currentPrice
+            currentPrice = latestPrice;
+        } else {
+            console.log(
+                " INTERVAL NOT UP!"
+            );
+            return;
+        }
+
+       
+    }
+
+    // Helpers
+    function getLatestPrice() public view returns (int256) {
+         (
+            /*uint80 roundID*/,
+            int price,
+            /*uint startedAt*/,
+            /*uint timeStamp*/,
+            /*uint80 answeredInRound*/
+        ) = pricefeed.latestRoundData();
+
+        return price; //  example price returned 3034715771688
+    }
+
+    function compareStrings(string memory a, string memory b) internal pure returns (bool) {
+        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+    }
+  
+
+    function updateAllTokenUris(string memory trend) internal {
+        if (compareStrings("bear", trend)) {
+            console.log(" UPDATING TOKEN URIS WITH ", "bear", trend);
+            for (uint i = 0; i < _tokenIdCounter.current() ; i++) {
+                _setTokenURI(i, bearUrisIpfs[0]);
+            } 
+            
+        } else {     
+            console.log(" UPDATING TOKEN URIS WITH ", "bull", trend);
+
+            for (uint i = 0; i < _tokenIdCounter.current() ; i++) {
+                _setTokenURI(i, bullUrisIpfs[0]);
+            }  
+        }   
+        emit TokensUpdated(trend);
+    }
+
+    function setPriceFeed(address newFeed) public onlyOwner {
+        pricefeed = AggregatorV3Interface(newFeed);
+    }
+    function setInterval(uint256 newInterval) public onlyOwner {
+        interval = newInterval;
+    }
+    
+
+
+    // The following functions are overrides required by Solidity.
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+        internal
+        override(ERC721, ERC721Enumerable)
+    {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
