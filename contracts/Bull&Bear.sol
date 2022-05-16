@@ -130,34 +130,33 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, KeeperCompatibl
     }
   
 
-  function updateAllTokenUris(string memory trend) internal {
-      if (compareStrings("bear", trend)) {
-          console.log(" UPDATING TOKEN URIS WITH ", "bear", trend);
-          for (uint i = 0; i < _tokenIdCounter.current() ; i++) {
-            _setTokenURI(i, bearUrisIpfs[0]);
-          } 
-          
-      } else {     
-          console.log(" UPDATING TOKEN URIS WITH ", "bull", trend);
+    function updateAllTokenUris(string memory trend) internal {
+        if (compareStrings("bear", trend)) {
+            console.log(" UPDATING TOKEN URIS WITH ", "bear", trend);
+            for (uint i = 0; i < _tokenIdCounter.current() ; i++) {
+                _setTokenURI(i, bearUrisIpfs[0]);
+            } 
+            
+        } else {     
+            console.log(" UPDATING TOKEN URIS WITH ", "bull", trend);
 
-          for (uint i = 0; i < _tokenIdCounter.current() ; i++) {
-            _setTokenURI(i, bullUrisIpfs[0]);
-          }  
-      }   
-      emit TokensUpdated(trend);
-  }
+            for (uint i = 0; i < _tokenIdCounter.current() ; i++) {
+                _setTokenURI(i, bullUrisIpfs[0]);
+            }  
+        }   
+        emit TokensUpdated(trend);
+    }
 
-  function setPriceFeed(address newFeed) public onlyOwner {
-      pricefeed = AggregatorV3Interface(newFeed);
-  }
-  function setInterval(uint256 newInterval) public onlyOwner {
-      interval = newInterval;
-  }
+    function setPriceFeed(address newFeed) public onlyOwner {
+        pricefeed = AggregatorV3Interface(newFeed);
+    }
+    function setInterval(uint256 newInterval) public onlyOwner {
+        interval = newInterval;
+    }
     
 
 
     // The following functions are overrides required by Solidity.
-
     function _beforeTokenTransfer(address from, address to, uint256 tokenId)
         internal
         override(ERC721, ERC721Enumerable)
