@@ -15,15 +15,24 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 // ./interfaces/KeeperCompatibleInterface.sol
 import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
 
-// Dev imports. This only works on a local dev network
-// and will not work on any test or main livenets.
+// Dev imports
 import "hardhat/console.sol";
 
-contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
+
+contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, KeeperCompatibleInterface, Ownable  {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
+    AggregatorV3Interface public pricefeed;
+    
+    /**
+    * Use an interval in seconds and a timestamp to slow execution of Upkeep
+    */
+    uint public /* immutable */ interval; 
+    uint public lastTimeStamp;
 
+    int256 public currentPrice;
+    
     // IPFS URIs for the dynamic nft graphics/metadata.
     string[] bullUrisIpfs = [
         "https://ipfs.io/ipfs/QmRXyfi3oNZCubDxiVFre3kLZ8XeGt6pQsnAQRZ7akhSNs?filename=gamer_bull.json",
@@ -36,9 +45,25 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         "https://ipfs.io/ipfs/QmbKhBXVWmwrYsTPFYfroR2N7NAekAMxHUVg2CWks7i9qj?filename=simple_bear.json"
     ];
 
-    constructor() ERC721("Bull&Bear", "BBTK") {}
+    event TokensUpdated(string marketTrend);
 
-    function safeMint(address to) public {
+    // For testing with the mock on Rinkeby, pass in 10(seconds) for `updateInterval` and the address of my 
+    // deployed  MockPriceFeed.sol contract (0xD753A1c190091368EaC67bbF3Ee5bAEd265aC420).
+    constructor(uint updateInterval, address _pricefeed) ERC721("Bull&Bear", "BBTK") {
+        // Set the keeper update interval
+        interval = updateInterval; 
+        lastTimeStamp = block.timestamp;  //  seconds since unix epoch
+
+        // set the price feed address to
+        // BTC/USD Price Feed Contract Address on Rinkeby: https://rinkeby.etherscan.io/address/0xECe365B379E1dD183B20fc5f022230C044d51404
+        // or the MockPriceFeed Contract
+        pricefeed = AggregatorV3Interface(_pricefeed); // To pass in the mock
+
+        // set the price for the chosen currency pair.
+        currentPrice = getLatestPrice();
+    }
+
+    function safeMint(address to) public  {
         // Current counter value will be the minted token's token ID.
         uint256 tokenId = _tokenIdCounter.current();
 
@@ -52,20 +77,9 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         string memory defaultUri = bullUrisIpfs[0];
         _setTokenURI(tokenId, defaultUri);
 
-        console.log(
-            "DONE!!! minted token ",
-            tokenId,
-            " and assigned token url: ",
-            defaultUri
-        );
+        console.log("DONE!!! minted token ", tokenId, " and assigned token url: ", defaultUri);
     }
 
-    // The following functions are overrides required by Solidity.
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override(ERC721, ERC721Enumerable) {
     function checkUpkeep(bytes calldata /* checkData */) external view override returns (bool upkeepNeeded, bytes memory /*performData */) {
          upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
     }
@@ -117,7 +131,6 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         return price; //  example price returned 3034715771688
     }
   
-
     function updateAllTokenUris(string memory trend) internal {
         if (compareStrings("bear", trend)) {
             console.log(" UPDATING TOKEN URIS WITH ", "bear", trend);
@@ -156,10 +169,7 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    function _burn(uint256 tokenId)
-        internal
-        override(ERC721, ERC721URIStorage)
-    {
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
         super._burn(tokenId);
     }
 
