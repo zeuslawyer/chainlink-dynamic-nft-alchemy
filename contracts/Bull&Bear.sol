@@ -116,10 +116,6 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
 
         return price; //  example price returned 3034715771688
     }
-
-    function compareStrings(string memory a, string memory b) internal pure returns (bool) {
-        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
-    }
   
 
     function updateAllTokenUris(string memory trend) internal {
@@ -146,6 +142,10 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         interval = newInterval;
     }
     
+
+    function compareStrings(string memory a, string memory b) internal pure returns (bool) {
+        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+    }
 
 
     // The following functions are overrides required by Solidity.
