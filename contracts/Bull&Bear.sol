@@ -25,6 +25,8 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     Counters.Counter private _tokenIdCounter;
 
     // IPFS URIs for the dynamic nft graphics/metadata.
+    // NOTE: These connect to my IPFS Companion node.
+    // You should upload the contents of the /ipfs folder to your own node for development.
     string[] bullUrisIpfs = [
         "https://ipfs.io/ipfs/QmRXyfi3oNZCubDxiVFre3kLZ8XeGt6pQsnAQRZ7akhSNs?filename=gamer_bull.json",
         "https://ipfs.io/ipfs/QmRJVFeMrtYS2CUVUM2cHJpBV5aX2xurpnsfZxLTTQbiD3?filename=party_bull.json",
