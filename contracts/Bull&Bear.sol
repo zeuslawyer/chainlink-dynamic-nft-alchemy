@@ -32,7 +32,7 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, KeeperCompatibl
     uint256[] public s_randomWords;
     uint256 public s_requestId;
     uint32 public callbackGasLimit = 500000; // set higher as fulfillRandomWords is doing a LOT of heavy lifting.
-    uint64 s_subscriptionId; // private.
+    uint64 public s_subscriptionId;
     bytes32 keyhash =  0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc; // keyhash, see for Rinkeby https://docs.chain.link/docs/vrf-contracts/#rinkeby-testnet
     
     /**
@@ -198,7 +198,7 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, KeeperCompatibl
   }
 
 
-  function setSubscriptionId(uint32 maxGas) public onlyOwner {
+  function setCallbackGasLimit(uint32 maxGas) public onlyOwner {
       callbackGasLimit = maxGas;
   }
 
