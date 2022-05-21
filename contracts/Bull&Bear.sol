@@ -28,8 +28,7 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, KeeperCompatibl
     AggregatorV3Interface public pricefeed;
 
     // VRF
-    VRFCoordinatorV2Interface COORDINATOR;
-    address vrfCoordinator = 0x6168499c0cFfCaCD319c818142124B7A15E857ab;
+    VRFCoordinatorV2Interface public COORDINATOR;
     uint256[] public s_randomWords;
     uint256 public s_requestId;
     uint32 public callbackGasLimit = 500000; // set higher as fulfillRandomWords is doing a LOT of heavy lifting.
@@ -62,23 +61,19 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, KeeperCompatibl
 
     event TokensUpdated(string marketTrend);
 
-    // For testing with the mock on Rinkeby, pass in 10(seconds) for `updateInterval` and the address of my 
-    // deployed  MockPriceFeed.sol contract (0xD753A1c190091368EaC67bbF3Ee5bAEd265aC420).
-    constructor(uint updateInterval, address _pricefeed) ERC721("Bull&Bear", "BBTK") VRFConsumerBaseV2(vrfCoordinator) {
+    // For testing with the mock on Rinkeby, pass in 10(seconds) for `updateInterval` and the address of your 
+    // deployed  MockPriceFeed.sol contract.
+    // BTC/USD Price Feed Contract Address on Rinkeby: https://rinkeby.etherscan.io/address/0xECe365B379E1dD183B20fc5f022230C044d51404
+    // Setup VRF. Rinkeby VRF Coordinator 0x6168499c0cFfCaCD319c818142124B7A15E857ab
+    constructor(uint updateInterval, address _pricefeed, address _vrfCoordinator) ERC721("Bull&Bear", "BBTK") VRFConsumerBaseV2(_vrfCoordinator) {
         // Set the keeper update interval
         interval = updateInterval; 
         lastTimeStamp = block.timestamp;  //  seconds since unix epoch
 
-
-        // BTC/USD Price Feed Contract Address on Rinkeby: https://rinkeby.etherscan.io/address/0xECe365B379E1dD183B20fc5f022230C044d51404
-        // or the MockPriceFeed Contract
         pricefeed = AggregatorV3Interface(_pricefeed); // To pass in the mock
-
         // set the price for the chosen currency pair.
         currentPrice = getLatestPrice();
-
-        // Setup VRF
-        COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator); // Rinkeby VRF Coordinator address.
+        COORDINATOR = VRFCoordinatorV2Interface(_vrfCoordinator);  
     }
 
     function safeMint(address to) public  {
@@ -160,6 +155,8 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, KeeperCompatibl
             1 // `numWords` : number of random values we want. Max number for rinkeby is 500 (https://docs.chain.link/docs/vrf-contracts/#rinkeby-testnet)
         );
 
+        console.log("Request ID: ", s_requestId);
+
         // requestId looks like uint256: 80023009725525451140349768621743705773526822376835636211719588211198618496446
     }
 
@@ -171,6 +168,8 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, KeeperCompatibl
   ) internal override {
     s_randomWords = randomWords;
     // randomWords looks like this uint256: 68187645017388103597074813724954069904348581739269924188458647203960383435815
+
+    console.log("...Fulfilling random Words");
     
     string[] memory urisForTrend = currentMarketTrend == MarketTrend.BULL ? bullUrisIpfs : bearUrisIpfs;
     uint256 idx = randomWords[0] % urisForTrend.length; // use modulo to choose a random index.
@@ -201,6 +200,10 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, KeeperCompatibl
 
   function setSubscriptionId(uint32 maxGas) public onlyOwner {
       callbackGasLimit = maxGas;
+  }
+
+  function setVrfCoodinator(address _address) public onlyOwner {
+    COORDINATOR = VRFCoordinatorV2Interface(_address);
   }
     
 
