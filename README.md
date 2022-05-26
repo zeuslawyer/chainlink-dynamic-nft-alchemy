@@ -24,7 +24,7 @@ This project mints Dynamic NFTs that change based on the market price of an asse
     <img src="./ipfs/simple_bear.png" width = "200" />
 </p>
 
-The entire project is designed for each of use by those new to Web3 and can be run from a Remix in-browser IDE and network environment.
+The entire project is designed for ease of use by those new to Web3 and can be run from a Remix in-browser IDE and network environment.
 
 ### Expanding your skills
 
