@@ -198,7 +198,7 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, KeeperCompatibl
   }
 
 
-  function setSubscriptionId(uint32 maxGas) public onlyOwner {
+  function setSubscriptionGasLimit(uint32 maxGas) public onlyOwner {
       callbackGasLimit = maxGas;
   }
 
