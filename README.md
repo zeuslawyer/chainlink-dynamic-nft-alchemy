@@ -81,3 +81,9 @@ Once deployed to one of the testnets mentioned above, your NFT should be viewabl
 ### Thank you!
 
 Thank you for being curious and hungry to participate in the new Web3 movement! If you have any questions, reach out on [Twitter](https://twitter.com/zubinpratap) or tag me on [LinkedIn](https://linkedin.com/in/zubinpratap).
+
+#### [Updated 14 June 2022]
+
+Added basic testing on the `main` branch to test deployment of the `Bull&Bear.sol` NFT contract. Tests use `mocha, chai, , ethers and waffle`. Please do `yarn install` using the updated `package.json` to pull down the developer dependencies needed to run the tests.
+
+To run tests, from the project root, please run `yarn hardhat test`.
