@@ -84,13 +84,14 @@ contract BullBear is ERC721, ERC721Enumerable, ERC721URIStorage, KeeperCompatibl
 
     function checkUpkeep(bytes calldata /* checkData */) external view override returns (bool upkeepNeeded, bytes memory /*performData */) {
          upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
+
     }
 
     function performUpkeep(bytes calldata /* performData */ ) external override {
         //We highly recommend revalidating the upkeep in the performUpkeep function
         if ((block.timestamp - lastTimeStamp) > interval ) {
             lastTimeStamp = block.timestamp;         
-            int latestPrice =  getLatestPrice(); 
+            int latestPrice =  getLatestPrice();
         
             if (latestPrice == currentPrice) {
                 console.log("NO CHANGE -> returning!");
