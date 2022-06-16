@@ -91,4 +91,4 @@ Added basic testing on the `main` branch to test deployment of the `Bull&Bear.so
 To run tests, from the project root, please run `yarn hardhat test`.
 
 [Updated 15 June 2022]
-Extended the tests to include `MockPriceFeed`. **Note** that the pragma and imported mock was updated to v0.7 to overcome the error that "interfaces cannot inherit interfaces" that was thrown on v0.6.
+In the `price-feeds` branch, extended the tests to include `MockPriceFeed`. **Note** that the pragma and imported mock was updated to v0.7 to overcome the error that "interfaces cannot inherit interfaces" that was thrown on v0.6. Also added tests for keepers logic that uses the price feeds to dynamically update NFT data.
