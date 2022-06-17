@@ -128,13 +128,6 @@ describe("Bull&Bear Token Contract", () => {
 
     upkeepNeeded = (await tokenContract.checkUpkeep(checkData)).upkeepNeeded;
     expect(upkeepNeeded).to.be.true;
-
-    // TODO - check timestamps in token contract against block immediately after upkeep
-    // const latestBlockTs = await getLatestBlockTs();
-
-    // let lastUpkeepTs = await tokenContract.lastTimeStamp();
-    // let timeElapsedSinceUpkeep = latestBlockTs - lastUpkeepTs;
-    // expect(timeElapsedSinceUpkeep).to.be.lessThan(UPDATE_INTERVAL_SEC);
   });
 
   it("Correctly does not perform upkeep", async () => {
@@ -155,6 +148,22 @@ describe("Bull&Bear Token Contract", () => {
     upkeepTx = await tokenContract.performUpkeep(checkData);
     upkeepTx.wait(1);
     expect(await tokenContract.tokenURI(TOKEN_ID_0)).to.equal(currentUri);
+  });
+
+  it("Correctly updates timestamp during performUpkeep ", async () => {
+    const latestBlockTs = await getLatestBlockTs();
+    let lastUpkeepTs = (await tokenContract.lastTimeStamp()).toNumber();
+
+    moveTime(UPDATE_INTERVAL_SEC + 1);
+    moveBlocks(1);
+
+    // Perform upkeep to update last upkeep timestamp in Token contract.
+    let upkeepTx = await tokenContract.performUpkeep(checkData);
+    upkeepTx.wait(1);
+    const updatedUpkeepTs = (await tokenContract.lastTimeStamp()).toNumber();
+
+    expect(updatedUpkeepTs).to.not.equal(lastUpkeepTs);
+    expect(updatedUpkeepTs).to.be.greaterThan(lastUpkeepTs);
   });
 
   it("Upkeep correctly updates Token URIs on consecutive price decreases", async () => {
@@ -198,7 +207,7 @@ describe("Bull&Bear Token Contract", () => {
     moveTime(UPDATE_INTERVAL_SEC + 1);
     moveBlocks(1);
 
-    upkeepTx = await tokenContract.performUpkeep(checkData);
+    let upkeepTx = await tokenContract.performUpkeep(checkData);
     upkeepTx.wait(1);
 
     const newTokenUri = await tokenContract.tokenURI(TOKEN_ID_0);
