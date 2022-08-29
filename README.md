@@ -60,6 +60,10 @@ This repo is organized in "layers". Each branch below represents the subsequent 
 
 - `main`: has the starting code and the IPFS picture and json files. Also has the Dynamic NFT (ERC721) smart contract code.
 - `price-feeds` has the code that adds [Chainlink Data Feeds](https://docs.chain.link/docs/get-the-latest-price/) logic and functionality along with the implementation of the Keepers interface so that our NFT Contract is [Keepers compatible](https://docs.chain.link/docs/chainlink-keepers/compatible-contracts/). It also has the mock Price Feeds smart contract called `MockPriceFeed.sol` which can be used to mock what calls to the actual Chainlink price feed would do. An example of what the return value from a price feed looks like is: `int256 3034715771688` which denotes the price up to 8 decimals.
+
+> :warning: **When using Keepers, the logic in the callback function is for demo purposes only.** It currently loops which is inefficient and costs a lot of gas (which gets converted to LINK). So, when [registering your contract as an Upkeep](https://docs.chain.link/docs/chainlink-keepers/job-scheduler/#entering-upkeep-details), put in at least 500,000 as your callback gas limit.  You may need to increase that depending on the then-current cost of ETH/LINK on the day (even on testnets).  
+
+
 - `randomness` contains the code for the [assignment](#assignment).
 
 ### Assignment
