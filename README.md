@@ -80,7 +80,7 @@ A suggested implementation of the assignment is in the branch called `randomness
 ### Viewing NFTs on Opensea
 
 Once deployed to one of the testnets mentioned above, your NFT should be viewable on [Opensea testnets](https://testnets.opensea.io/).
-**Note:** if the dynamic NFT is taking time to change on OpenSea that's not unusual. In that even just call your contracts `tokenUri()` method and check what IPFS URI is being pointed to. If it changes, then your code is working but OpenSea's cache may not show the new image for a while, even if you do a [force-update on Open Sea](https://docs.opensea.io/docs/3-viewing-your-items-on-opensea). However, you should see the name of the NFT update even if the image is lagging.
+**Note:** if the dynamic NFT is taking time to change on OpenSea that's not unusual. In that even just call your contracts `tokenURI()` method and check what IPFS URI is being pointed to. If it changes, then your code is working but OpenSea's cache may not show the new image for a while, even if you do a [force-update on Open Sea](https://docs.opensea.io/docs/3-viewing-your-items-on-opensea). However, you should see the name of the NFT update even if the image is lagging.
 
 ### Thank you!
 
